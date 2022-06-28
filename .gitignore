@@ -11,8 +11,8 @@ node_modules
 dist
 dist-ssr
 *.local
-
-/utils/dummmyData.ts
+Transcrypt/src/utils/dummyData.ts
+dummmyData.ts
 
 # Editor directories and files
 .vscode/*

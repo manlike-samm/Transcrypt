@@ -1,8 +1,10 @@
 import React, { useContext, useEffect, useState } from "react";
 
+import { ISt } from "../interfaces";
+
 import { AiFillPlayCircle } from "react-icons/ai";
 import { SiEthereum } from "react-icons/si";
-import { BsInfoCircle } from "react-icons/bs";
+// import { BsInfoCircle } from "react-icons/bs";
 
 import { TransactionContext } from "../context/TransactionContext";
 import { shortenAddress } from "../utils/shortAddress";
@@ -14,8 +16,7 @@ const TransactionsCard = ({
   message,
   keyword,
   amount,
-  url,
-}) => {
+}: ISt): JSX.Element => {
   return (
     <div
       className="bg-white m-4 flex flex-1
@@ -61,8 +62,7 @@ const TransactionsCard = ({
     </div>
   );
 };
-const ContactBig = () => {
-  const [wallet, setWallet] = useState(true);
+const ContactBig: React.FC = () => {
   const {
     currentAccount,
     connectWallet,
@@ -73,22 +73,22 @@ const ContactBig = () => {
     transactions,
   } = useContext(TransactionContext);
 
-  useEffect(() => {
-    if (!connectWallet) {
-      setWallet(false);
-    }
-  });
-
-  const handleChange = (e) => {
+  const handleChange = (
+    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
+  ) => {
     const { name, value } = e.target;
-    setFormData((prevState) => ({ ...prevState, [name]: value }));
+    setFormData({ ...formData, [name]: value });
   };
 
-  const { addressTo, amount, keyword, message } = formData;
-  const handleSubmit = (e) => {
+  const handleSubmit = (e: React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
     e.preventDefault(); //to prevent the form from loading after submission
 
-    if (!addressTo || !amount || !keyword || !message)
+    if (
+      !formData.addressTo ||
+      !formData.amount ||
+      !formData.keyword ||
+      !formData.message
+    )
       return alert("Please fill all fields");
 
     sendTransaction();
@@ -96,7 +96,6 @@ const ContactBig = () => {
 
   return (
     <>
-      {/* <div className="font-mono hidden  sm:block "> */}
       <div className=" flex flex-col sm:flex-row items-center w-5/6 sm:w-fit h-full bg-sky-100 bg-gradient-to-tr rounded-xl px-8 mx-auto">
         <div className="p-3 mt-10 flex justify-end items-start flex-col rounded-xl h-40 sm:w-72 w-full my-5 eth-card white-glassmorphism ">
           <div className="flex justify-between flex-col w-full h-full">
@@ -104,18 +103,19 @@ const ContactBig = () => {
               <div className="w-10 h-10 rounded-full border-2 border-white flex justify-center items-center">
                 <SiEthereum fontSize={21} color="#fff" />
               </div>
-              <BsInfoCircle fontSize={17} color="#fff" />
             </div>
             <div>
               <p className="text-white font-light text-sm">
-                {shortenAddress(currentAccount)}
+                {currentAccount && shortenAddress(currentAccount)}
               </p>
               <p className="text-white font-semibold text-lg mt-1">Ethereum</p>
             </div>
           </div>
         </div>
         <div className=" bg-sky-100 p-4 sm:p-8 sm:w-[400px] rounded-xl ">
-          {!wallet && (
+          {currentAccount ? (
+            <div></div>
+          ) : (
             <button
               type="button"
               onClick={connectWallet}
@@ -131,7 +131,7 @@ const ContactBig = () => {
             <input
               type="text"
               name="addressTo"
-              value={addressTo}
+              value={formData?.addressTo}
               onChange={(e) => handleChange(e)}
               className=" w-full rounded p-2 bg-neutral-200 outline-none"
               placeholder="Address to"
@@ -141,7 +141,7 @@ const ContactBig = () => {
               type="number"
               name="amount"
               step="0.0001"
-              value={amount}
+              value={formData?.amount}
               onChange={(e) => handleChange(e)}
               className=" w-full rounded p-2 bg-neutral-200 outline-none"
               placeholder="Amount"
@@ -150,17 +150,17 @@ const ContactBig = () => {
             <input
               type="text"
               name="keyword"
-              value={keyword}
-              onChange={(e) => handleChange(e)}
+              value={formData?.keyword}
+              onChange={handleChange}
               className=" w-full rounded p-2 bg-neutral-200 outline-none"
               placeholder="Keyword(Gif)"
               required
             />
             <textarea
               name="message"
-              value={message}
+              value={formData?.message}
               onChange={(e) => handleChange(e)}
-              cols="30"
+              cols={30}
               className=" w-full p-2 bg-neutral-200 text-black outline-none rounded"
               placeholder="Enter Message"
               required
@@ -169,7 +169,7 @@ const ContactBig = () => {
             <button
               type="button"
               className="bg-indigo-900 text-white font-semibold py-2 px-4 w-full rounded hover:cursor-pointer hover:bg-indigo-500 eth-card"
-              onClick={handleSubmit}
+              onClick={(e) => handleSubmit(e)}
             >
               {!isLoading ? "Send Funds" : "Sending..."}
             </button>
@@ -190,7 +190,7 @@ const ContactBig = () => {
           )}
 
           <div className="flex flex-wrap justify-center items-center mt-4 sm:mt-10">
-            {[...transactions].reverse().map((transaction, i) => (
+            {[...transactions]?.reverse().map((transaction, i) => (
               <TransactionsCard key={i} {...transaction} />
             ))}
           </div>

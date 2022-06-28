@@ -1,11 +1,12 @@
-import React, { useEffect, useState } from "react";
+import { useEffect, useState, createContext } from "react";
 import { ethers } from "ethers";
+import { ISt, Val, IState } from "../interfaces";
 
 import { contractABI, contractAddress } from "../utils/constants";
 
-export const TransactionContext = React.createContext();
+export const TransactionContext = createContext<Val>({} as Val);
 
-const { ethereum } = window;
+const { ethereum }: any = window;
 
 const createEthereumContract = () => {
   const provider = new ethers.providers.Web3Provider(ethereum);
@@ -19,7 +20,13 @@ const createEthereumContract = () => {
   return transactionsContract;
 };
 
-export const TransactionsProvider = ({ children }) => {
+interface TransactionContextProviderPrpps {
+  children: JSX.Element | JSX.Element[];
+}
+
+export const TransactionsProvider = ({
+  children,
+}: TransactionContextProviderPrpps) => {
   const [formData, setFormData] = useState({
     addressTo: "",
     amount: "",
@@ -31,12 +38,7 @@ export const TransactionsProvider = ({ children }) => {
   const [transactionCount, setTransactionCount] = useState(
     localStorage.getItem("transactionCount")
   );
-  const [transactions, setTransactions] = useState([]);
-
-  const handleChange = (e) => {
-    const { name, value } = e.target;
-    setFormData((prevState) => ({ ...prevState, [name]: value }));
-  };
+  const [transactions, setTransactions] = useState<IState["transactions"]>([]);
 
   const getAllTransactions = async () => {
     try {
@@ -46,17 +48,15 @@ export const TransactionsProvider = ({ children }) => {
         const availableTransactions =
           await transactionsContract.getAllTransactions();
 
-        type Transactions = {
-          receiver: string;
-          sender: string;
-          timestamp: any;
-          message: string;
-          keyword: string;
-          amount: any;
-        };
-
-        const structuredTransactions = availableTransactions.map(
-          (transaction: Transactions) => ({
+        const structuredTransactions: ISt[] = availableTransactions.map(
+          (transaction: {
+            receiver: string;
+            sender: string;
+            timestamp: any;
+            message: string;
+            keyword: string;
+            amount: any;
+          }) => ({
             addressTo: transaction.receiver,
             addressFrom: transaction.sender,
             timestamp: new Date(
@@ -67,8 +67,6 @@ export const TransactionsProvider = ({ children }) => {
             amount: parseInt(transaction.amount._hex) / 10 ** 18,
           })
         );
-
-        console.log(structuredTransactions);
 
         setTransactions(structuredTransactions);
       } else {
@@ -96,8 +94,6 @@ export const TransactionsProvider = ({ children }) => {
       console.log(error);
     }
   };
-  console.log(currentAccount);
-  console.log(typeof ethereum);
 
   const checkIfTransactionsExists = async () => {
     try {
@@ -120,6 +116,7 @@ export const TransactionsProvider = ({ children }) => {
       const accounts = await ethereum.request({
         method: "eth_requestAccounts",
       });
+      console.log(accounts);
 
       setCurrentAccount(accounts[0]);
       window.location.reload();
@@ -185,13 +182,11 @@ export const TransactionsProvider = ({ children }) => {
   return (
     <TransactionContext.Provider
       value={{
-        transactionCount,
         connectWallet,
         transactions,
         currentAccount,
         isLoading,
         sendTransaction,
-        handleChange,
         formData,
         setFormData,
       }}
