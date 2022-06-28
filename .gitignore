@@ -12,7 +12,7 @@ dist
 dist-ssr
 *.local
 Transcrypt/src/utils/dummyData.ts
-dummmyData.ts
+dummyData.ts
 
 # Editor directories and files
 .vscode/*
