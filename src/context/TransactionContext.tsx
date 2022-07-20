@@ -1,6 +1,6 @@
 import { useEffect, useState, createContext } from "react";
 import { ethers } from "ethers";
-import { ISt, Val, IState } from "../interfaces";
+import { ISt, Val, IState } from "../types/index";
 
 import { contractABI, contractAddress } from "../utils/constants";
 
@@ -103,7 +103,7 @@ export const TransactionsProvider = ({
           await transactionsContract.getTransactionCount();
       }
     } catch (error) {
-      console.log(error);
+      console.log(error); //
 
       throw new Error("No ethereum object");
     }

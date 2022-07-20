@@ -1,6 +1,6 @@
 import React, { useContext, useEffect, useState } from "react";
 
-import { ISt } from "../interfaces";
+import { ISt } from "../types/index";
 
 import { AiFillPlayCircle } from "react-icons/ai";
 import { SiEthereum } from "react-icons/si";
@@ -190,9 +190,12 @@ const ContactBig: React.FC = () => {
           )}
 
           <div className="flex flex-wrap justify-center items-center mt-4 sm:mt-10">
-            {[...transactions]?.reverse().map((transaction, i) => (
-              <TransactionsCard key={i} {...transaction} />
-            ))}
+            {transactions &&
+              [...transactions]
+                .reverse()
+                .map((transaction, i) => (
+                  <TransactionsCard key={i} {...transaction} />
+                ))}
           </div>
         </div>
       </div>
